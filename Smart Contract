@@ -1,0 +1,43 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract WorkloadSharing {
+    struct Task {
+        uint256 id;
+        address creator;
+        uint256 reward;
+        bool completed;
+        mapping(address => bool) workers;
+    }
+
+    mapping(uint256 => Task) public tasks;
+    uint256 public nextTaskId = 1;
+
+    event TaskCreated(uint256 taskId, address creator, uint256 reward);
+    event TaskCompleted(uint256 taskId, address worker);
+
+    function createTask(uint256 _reward) public payable {
+        require(msg.value == _reward, "Invalid reward amount");
+
+        Task memory task = Task({
+            id: nextTaskId,
+            creator: msg.sender,
+            reward: _reward,
+            completed: false
+        });
+        tasks[nextTaskId] = task;
+        nextTaskId++;
+
+        emit TaskCreated(nextTaskId - 1, msg.sender, _reward);
+    }
+
+    function completeTask(uint256 _taskId) public {
+        require(tasks[_taskId].completed == false, "Task already completed");
+        require(tasks[_taskId].workers[msg.sender] == true, "Worker not assigned");
+
+        tasks[_taskId].completed = true;
+
+        payable(msg.sender).transfer(tasks[_taskId].reward);
+        emit TaskCompleted(_taskId, msg.sender);
+    }
+}
