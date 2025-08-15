@@ -1,0 +1,20 @@
+async function monitorTasks() {
+    const tasks = await getPendingTasks();
+    const currentTime = Date.now();
+
+    for (const task of tasks) {
+        if (currentTime - task.startTime > timeoutPeriod) {
+            console.log(`Task ${task.id} timed out. Reassigning...`);
+            await reassignTask(task.id);
+        }
+    }
+}
+
+async function reassignTask(taskId) {
+    const availableNodes = await getAvailableNodes();
+    if (availableNodes.length === 0) throw new Error('No nodes available for reassignment');
+
+    // Assign the task to a new node
+    const newNode = availableNodes[0];
+    await sendTaskToNode(newNode, taskId);
+}
