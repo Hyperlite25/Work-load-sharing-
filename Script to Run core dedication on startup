@@ -1,0 +1,27 @@
+sudo nano /etc/systemd/system/workload-sharing-cpu-alloc.service
+
+<Fill Area's with following content>
+
+[Unit]
+Description=Dedicate A76 Cores to Workload-Sharing
+
+[Service]
+Type=oneshot
+ExecStart=/path/to/your/script.sh
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
+
+<Enable and start the service>
+
+sudo systemctl daemon-reload
+sudo systemctl enable workload-sharing-cpu-alloc.service
+sudo systemctl start workload-sharing-cpu-alloc.service
+
+<Verify CPU Affinity>
+
+taskset -p $WORKLOAD_PID
+
+<This should display something like the following>
+pid  1234's current affinity mask: f (0x0000000f)
