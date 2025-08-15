@@ -1,4 +1,4 @@
-# Step 1: Set Up Your Environment><Bash
+# Step 1: Set Up Your Environment
 npm init -y
 npm install ipfs-core libp2p @libp2p/interface-transport @libp2p/websockets @multiformats/multiaddr @multiformats/peer-id
 
