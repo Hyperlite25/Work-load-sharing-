@@ -1,0 +1,109 @@
+<Step 1: Set Up Your Environment><Bash>
+npm init -y
+npm install ipfs-core libp2p @libp2p/interface-transport @libp2p/websockets @multiformats/multiaddr @multiformats/peer-id
+
+<Step 2: Create a script to initialize an IPFS node using Libp2p for peer-to-peer communication.><Javascript>
+const { create } = require('ipfs-core');
+const libp2p = require('@libp2p/core');
+const Websockets = require('@libp2p/websockets');
+
+async function startIPFSNode() {
+    const ipfs = await create({
+        libp2p: {
+            transports: [
+                new Websockets()
+            ]
+        }
+    });
+
+    console.log('IPFS node started');
+    console.log(`Peer ID: ${ipfs.id}`);
+
+    return ipfs;
+}
+
+startIPFSNode().catch(console.error);
+
+<Step 3: Extend the script to handle peer connections and data exchange.><Javascript>
+const { create } = require('ipfs-core');
+const libp2p = require('@libp2p/core');
+const Websockets = require('@libp2p/websockets');
+
+async function startIPFSNode() {
+    const ipfs = await create({
+        libp2p: {
+            transports: [
+                new Websockets()
+            ]
+        }
+    });
+
+    console.log('IPFS node started');
+    console.log(`Peer ID: ${ipfs.id}`);
+
+    // Add a listener for peer connections
+    ipfs.libp2p.addEventListener('peer:discovery', async (evt) => {
+        const { id, multiaddrs } = evt.detail;
+        console.log(`Discovered new peer ${id}`);
+        console.log(`Multiaddrs: ${multiaddrs.map(ma => ma.toString())}`);
+
+        // Connect to the discovered peer
+        try {
+            await ipfs.swarm.connect(multiaddrs);
+            console.log(`Connected to peer ${id}`);
+        } catch (error) {
+            console.error(`Failed to connect to peer ${id}:`, error);
+        }
+    });
+
+    return ipfs;
+}
+
+startIPFSNode().catch(console.error);
+
+<Step 4: Add functionality to share files or data between peers. (Probably unnecessary)>
+const { create } = require('ipfs-core');
+const libp2p = require('@libp2p/core');
+const Websockets = require('@libp2p/websockets');
+
+async function startIPFSNode() {
+    const ipfs = await create({
+        libp2p: {
+            transports: [
+                new Websockets()
+            ]
+        }
+    });
+
+    console.log('IPFS node started');
+    console.log(`Peer ID: ${ipfs.id}`);
+
+    // Add a listener for peer connections
+    ipfs.libp2p.addEventListener('peer:discovery', async (evt) => {
+        const { id, multiaddrs } = evt.detail;
+        console.log(`Discovered new peer ${id}`);
+        console.log(`Multiaddrs: ${multiaddrs.map(ma => ma.toString())}`);
+
+        // Connect to the discovered peer
+        try {
+            await ipfs.swarm.connect(multiaddrs);
+            console.log(`Connected to peer ${id}`);
+        } catch (error) {
+            console.error(`Failed to connect to peer ${id}:`, error);
+        }
+    });
+
+    // Add a file to IPFS
+    const { cid } = await ipfs.add({
+        path: 'hello.txt',
+        content: Buffer.from('Hello, world!')
+    });
+    console.log(`File added with CID: ${cid}`);
+
+    return ipfs;
+}
+
+startIPFSNode().catch(console.error);
+
+<Step 5: Save the script as ipfs-node.js and run it using Node.js>
+node ipfs-node.js
