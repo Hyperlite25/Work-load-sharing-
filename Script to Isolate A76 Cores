@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Define the A76 core indices (adjust based on your device)
+A76_CORES="0 1 2 3"  # Example: cores 0 to 3 are A76 cores
+
+# Get the PID of your workload-sharing process
+WORKLOAD_PID=$(pgrep -f "workload-sharing-daemon")  # Replace with actual process name or command
+
+if [ -z "$WORKLOAD_PID" ]; then
+    echo "Workload-sharing daemon not found."
+    exit 1
+fi
+
+# Set CPU affinity for the process to run only on A76 cores
+taskset -pc $A76_CORES $WORKLOAD_PID
+
+echo "Dedicated A76 cores to workload-sharing process with PID: $WORKLOAD_PID"
